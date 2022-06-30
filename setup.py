@@ -4,7 +4,6 @@ import os
 import sys
 from glob import glob
 from pprint import pprint
-from distutils.core import setup
 from setuptools import setup
 
 sys.path.insert(0, os.path.abspath('lib'))

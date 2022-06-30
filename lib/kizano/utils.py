@@ -1,4 +1,5 @@
 
+import copy
 import yaml
 
 def literal_scalar(self, tag, value, style=None):
