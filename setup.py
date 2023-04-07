@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath('lib'))
 setup_opts = {
     'name'                : 'kizano',
     # We change this default each time we tag a release.
-    'version'             : '1.0.0',
+    'version'             : '1.0.1',
     'description'         : 'Kizano code for quick access to functions.',
     'author'              : 'Markizano Draconus',
     'author_email'        : 'markizano@markizano.net',
