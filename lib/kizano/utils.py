@@ -86,7 +86,11 @@ def dictmerge(target, *args):
         if k in target and isinstance(v, dict):
             target[k] = dictmerge(target[k], v)
         elif k in target and isinstance(v, (set, tuple, list)):
-            target[k] = target[k] + v
+            oldtype = type(target[k])
+            # Coerce to list so we can add the two reliably
+            target[k] = oldtype( [*target[k]] + [*v] )
+            # Convert back to its original type afterwards.
         else:
             target[k] = v
     return target
+
