@@ -13,6 +13,12 @@ setup_opts = {
     # We change this default each time we tag a release.
     'version'             : '1.0.1',
     'description'         : 'Kizano code for quick access to functions.',
+    'long_description'    : ('This is a core library that should allow one to import and run with '
+                            'pre-built libraries. Common features like logging and configuration '
+                            'management should not need to be re-created in every project. This aims '
+                            'to minimize this by providing a core library of swiss army knife of'
+                            'common functionality.'),
+    'long_description_content_type': 'text/markdown',
     'author'              : 'Markizano Draconus',
     'author_email'        : 'markizano@markizano.net',
     'url'                 : 'https://markizano.net/',
