@@ -20,7 +20,7 @@ class LocalSyslogHandler(SysLogHandler):
         else:
             SysLogHandler.emit(self, record)
 
-def getLogger(name, log_level=None):
+def getLogger(name, log_level=None, log_format='standard'):
     '''
     Get a logger by the name provided. Set the log_level if you provide the second argument.
     If not, ask the environment for $LOG_LEVEL. If not, default to DEBUG.
@@ -37,10 +37,16 @@ def getLogger(name, log_level=None):
         log_level = log_level_map[ os.getenv('LOG_LEVEL', 'DEBUG').upper() ]
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
-    logging.basicConfig(format='%(asctime)s %(name)s.%(funcName)s(PID=%(process)d, %(levelname)s) %(message)s')
+    logFormats = {
+      'standard': '%(asctime)s %(name)s.%(funcName)s(PID=%(process)d %(levelname)-8s) %(message)s',
+      'json': '{ "time": "%(asctime)s", "function": "%(name)s.%(funcName)s", "pid": "%(process)d", "level": "%(levelname)s", "message", "%(message)s" }',
+      'csv': '%(asctime)s,%(name)s.%(funcName)s,%(levelname)s,%(message)s',
+    }
+    logging.basicConfig(format=logFormats.get(log_format, logFormats['standard']))
 
     syslog_handler = LocalSyslogHandler()
     syslog_handler.setLevel(log_level)
     logger.addHandler(syslog_handler)
 
     return logger
+
