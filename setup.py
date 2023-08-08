@@ -26,6 +26,7 @@ setup_opts = {
 
     'tests_require'       : ['nose', 'mock', 'coverage'],
     'install_requires'    : [
+      'PyYAML>=6.0.1',
     ],
     'package_dir'         : { 'kizano': 'lib/kizano' },
     'packages'            : [
