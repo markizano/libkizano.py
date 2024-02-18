@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath('lib'))
 setup_opts = {
     'name'                : 'kizano',
     # We change this default each time we tag a release.
-    'version'             : '1.0.2',
+    'version'             : '1.0.3',
     'description'         : 'Kizano code for quick access to functions.',
     'long_description'    : ('This is a core library that should allow one to import and run with '
                             'pre-built libraries. Common features like logging and configuration '
@@ -52,4 +52,3 @@ if sys.argv[1] == 'test':
 if 'DEBUG' in os.environ: pprint(setup_opts)
 
 setup(**setup_opts)
-

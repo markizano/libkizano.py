@@ -1,0 +1,28 @@
+[build-system]
+requires = ["pytest"]
+
+[project]
+name = "kizano"
+version = "1.0.3"
+dependencies = []
+requires-python = ">=3.1"
+authors = [
+  {name = "Markizano Draconus", email = "markizano@markizano.net"},
+]
+maintainers = [
+  {name = "Markizano Draconus", email = "markizano@markizano.net"},
+]
+description = "Library of functions that have served me no matter where I code."
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Homepage = "https://markizano.net"
+Documentation = "[Inline with Code]"
+Repository = "https://github.com/markizano/libkizano.py"
+"Bug Tracker" = "https://github.com/markizano/libkizano.py/issues"
+Changelog = "https://github.com/markizano/libkizano.py/blob/master/CHANGELOG.md"
