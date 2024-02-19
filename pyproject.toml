@@ -1,9 +1,10 @@
 [build-system]
-requires = ["pytest"]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "kizano"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = []
 requires-python = ">=3.1"
 authors = [
@@ -22,7 +23,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://markizano.net"
-Documentation = "[Inline with Code]"
+Documentation = "https://docs.markizano.net"
 Repository = "https://github.com/markizano/libkizano.py"
 "Bug Tracker" = "https://github.com/markizano/libkizano.py/issues"
 Changelog = "https://github.com/markizano/libkizano.py/blob/master/CHANGELOG.md"
