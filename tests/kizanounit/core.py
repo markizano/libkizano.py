@@ -6,6 +6,9 @@ class TestCore(unittest.TestCase):
   def setUp(self):
     pass
 
+  def tearDown(self):
+    pass
+
   def testLog(self):
     import kizano
     log = kizano.getLogger(__name__, 10)
@@ -15,5 +18,3 @@ class TestCore(unittest.TestCase):
     log.debug('DEBUG')
     log.info('__REALLY_LONG_MESSAGE__' * 2849)
 
-  def tearDown(self):
-    pass

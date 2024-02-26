@@ -58,10 +58,9 @@ def getLogger(name, log_level=None, log_format='standard'):
     syslog_handler.setLevel(log_level)
     syslog_handler.setFormatter(formatter)
 
-    if sys.stderr.isatty():
-        print_handler = logging.StreamHandler(sys.stderr)
-        print_handler.setLevel(log_level)
-        print_handler.setFormatter(formatter)
+    print_handler = logging.StreamHandler(sys.stderr)
+    print_handler.setLevel(log_level)
+    print_handler.setFormatter(formatter)
 
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
