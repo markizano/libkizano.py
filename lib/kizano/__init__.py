@@ -43,4 +43,3 @@ class Config(object):
         return Config.__CONFIGCACHE
 
 getConfig = Config.getConfig
-

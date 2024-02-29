@@ -37,7 +37,7 @@ def getLogger(name, log_level=None, log_format='standard'):
         # by above array $log_level_map
         log_level = log_level_map[ os.getenv('LOG_LEVEL', 'DEBUG').upper() ]
     logFormats = {
-      'standard': '%(asctime)s %(name)s.%(funcName)s(PID=%(process)d %(levelname)-8s) %(message)s',
+      'standard': '%(asctime)s N=%(name)s F=%(funcName)s PID=%(process)d %(levelname)s: %(message)s',
       'json': '{ "time": "%(asctime)s", "function": "%(name)s.%(funcName)s", "pid": "%(process)d", "level": "%(levelname)s", "message", "%(message)s" }',
       'csv': '%(asctime)s,%(name)s.%(funcName)s,%(levelname)s,%(message)s',
     }
@@ -65,7 +65,21 @@ def getLogger(name, log_level=None, log_format='standard'):
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
     logger.addHandler(syslog_handler)
-    if sys.stderr.isatty():
-        logger.addHandler(print_handler)
+    logger.addHandler(print_handler)
 
     return logger
+
+def syslogger():
+    '''
+    Command line entry point that allows me to accept stdin as a lot of log messages
+    and then send them to the syslog endpoint.
+    My challenge with /usr/bin/logger is the time format is not iso8601 and I can't
+    control the format of the message.
+    '''
+    prog = sys.argv[1] or 'log'
+    log = getLogger(prog, log_format=os.environ.get('LOG_FORMAT', 'standard'))
+    if 'NO_STDERR' in os.environ:
+        log.removeHandler(log.handlers[1])
+        sys.stderr.close()
+    for line in sys.stdin:
+        log.info(line.strip())

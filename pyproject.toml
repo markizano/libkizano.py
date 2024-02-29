@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kizano"
-version = "1.0.4"
-dependencies = []
+version = "1.0.5"
+dependencies = ["PyYAML>=6.0.1"]
 requires-python = ">=3.1"
 authors = [
   {name = "Markizano Draconus", email = "markizano@markizano.net"},
@@ -16,6 +16,7 @@ maintainers = [
 description = "Library of functions that have served me no matter where I code."
 readme = "README.md"
 license = {file = "LICENSE.txt"}
+
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
@@ -27,3 +28,6 @@ Documentation = "https://docs.markizano.net"
 Repository = "https://github.com/markizano/libkizano.py"
 "Bug Tracker" = "https://github.com/markizano/libkizano.py/issues"
 Changelog = "https://github.com/markizano/libkizano.py/blob/master/CHANGELOG.md"
+
+[project.scripts]
+log = "kizano.logger:syslogger"
