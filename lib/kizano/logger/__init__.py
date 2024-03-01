@@ -80,6 +80,5 @@ def syslogger():
     log = getLogger(prog, log_format=os.environ.get('LOG_FORMAT', 'standard'))
     if 'NO_STDERR' in os.environ:
         log.removeHandler(log.handlers[1])
-        sys.stderr.close()
     for line in sys.stdin:
         log.info(line.strip())
