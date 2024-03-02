@@ -43,10 +43,6 @@ def getLogger(name, log_level=None, log_format='standard'):
     }
     format_str = logFormats.get(log_format, 'standard')
     logging.basicConfig(format=format_str, datefmt='%F %T')
-    root = logging.getLogger()
-    # AVoid duplicate log messages by removing root logger handlers.
-    for h in root.handlers:
-        root.removeHandler(h)
 
     formatter = logging.Formatter(format_str)
     if os.path.exists('/dev/log'):
@@ -63,6 +59,8 @@ def getLogger(name, log_level=None, log_format='standard'):
     print_handler.setFormatter(formatter)
 
     logger = logging.getLogger(name)
+    # Avoid duplicate log messages
+    logger.propagate = False
     logger.setLevel(log_level)
     logger.addHandler(syslog_handler)
     logger.addHandler(print_handler)
