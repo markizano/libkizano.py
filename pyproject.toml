@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kizano"
-version = "1.0.5"
-dependencies = ["PyYAML>=6.0.1"]
+version = "1.0.6"
 requires-python = ">=3.1"
+dependencies = [ "PyYAML>=6.0.1" ]
 authors = [
   {name = "Markizano Draconus", email = "markizano@markizano.net"},
 ]
