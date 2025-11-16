@@ -1,8 +1,8 @@
 
 import os
-from kizano.logger import getLogger
+import kizano.logger as logger
 import kizano.utils as utils
-log = getLogger(__name__)
+log = logger.getLogger(__name__)
 
 class Config(object):
     '''
@@ -39,7 +39,9 @@ class Config(object):
             except Exception as e:
                 log.info(f'Did not load {cfgfile}, reason={e}')
                 continue
-        log.debug(f'Cache-Miss: Config loaded - {Config.__CONFIGCACHE}')
+        log.debug('Cache-Miss: Config loaded!')
         return Config.__CONFIGCACHE
 
 getConfig = Config.getConfig
+
+__all__ = ['logger', 'Config', 'getConfig', 'utils']
