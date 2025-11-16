@@ -21,7 +21,7 @@ class LocalSyslogHandler(SysLogHandler):
         else:
             super().emit(record)
 
-def getLogger(name, log_level=None, log_format='standard'):
+def getLogger(name, log_level=None, log_format='standard', use_syslog: bool = True):
     '''
     Get a logger by the name provided. Set the log_level if you provide the second argument.
     If not, ask the environment for $LOG_LEVEL. If not, default to DEBUG.
@@ -37,22 +37,23 @@ def getLogger(name, log_level=None, log_format='standard'):
         # by above array $log_level_map
         log_level = log_level_map[ os.getenv('LOG_LEVEL', 'DEBUG').upper() ]
     logFormats = {
-      'standard': '%(asctime)s N=%(name)s F=%(funcName)s PID=%(process)d %(levelname)s: %(message)s',
-      'json': '{ "time": "%(asctime)s", "function": "%(name)s.%(funcName)s", "pid": "%(process)d", "level": "%(levelname)s", "message", "%(message)s" }',
-      'csv': '%(asctime)s,%(name)s.%(funcName)s,%(levelname)s,%(message)s',
+        'standard': '%(asctime)s N=%(name)s F=%(funcName)s PID=%(process)d %(levelname)s: %(message)s',
+        'json': '{ "time": "%(asctime)s", "function": "%(name)s.%(funcName)s", "pid": "%(process)d", "level": "%(levelname)s", "message", "%(message)s" }',
+        'csv': '%(asctime)s,%(name)s.%(funcName)s,%(levelname)s,%(message)s',
     }
     format_str = logFormats.get(log_format, 'standard')
     logging.basicConfig(format=format_str, datefmt='%F %T')
 
     formatter = logging.Formatter(format_str)
-    if os.path.exists('/dev/log'):
-        syslog_handler = LocalSyslogHandler(address=('/dev/log'), facility=SysLogHandler.LOG_DAEMON, socktype=socket.SOCK_STREAM)
-    elif os.path.exists('/var/run/syslog'):
-        syslog_handler = LocalSyslogHandler(address='/var/run/syslog', facility=SysLogHandler.LOG_DAEMON, socktype=socket.SOCK_STREAM)
-    else: # Use UDP if we can't find a local syslog socket
-        syslog_handler = LocalSyslogHandler(address=('localhost', 514), facility=SysLogHandler.LOG_DAEMON, socktype=socket.SOCK_DGRAM)
-    syslog_handler.setLevel(log_level)
-    syslog_handler.setFormatter(formatter)
+    if use_syslog:
+        if os.path.exists('/dev/log'):
+            syslog_handler = LocalSyslogHandler(address=('/dev/log'), facility=SysLogHandler.LOG_DAEMON, socktype=socket.SOCK_STREAM)
+        elif os.path.exists('/var/run/syslog'):
+            syslog_handler = LocalSyslogHandler(address='/var/run/syslog', facility=SysLogHandler.LOG_DAEMON, socktype=socket.SOCK_STREAM)
+        else: # Use UDP if we can't find a local syslog socket
+            syslog_handler = LocalSyslogHandler(address=('localhost', 514), facility=SysLogHandler.LOG_DAEMON, socktype=socket.SOCK_DGRAM)
+        syslog_handler.setLevel(log_level)
+        syslog_handler.setFormatter(formatter)
 
     print_handler = logging.StreamHandler(sys.stderr)
     print_handler.setLevel(log_level)
@@ -62,7 +63,8 @@ def getLogger(name, log_level=None, log_format='standard'):
     # Avoid duplicate log messages
     logger.propagate = False
     logger.setLevel(log_level)
-    logger.addHandler(syslog_handler)
+    if use_syslog:
+        logger.addHandler(syslog_handler)
     logger.addHandler(print_handler)
 
     return logger
