@@ -4,6 +4,7 @@ import sys
 import socket
 import logging
 from logging.handlers import SysLogHandler
+from typing import Literal, Optional, Union
 
 class LocalSyslogHandler(SysLogHandler):
     def emit(self, record):
@@ -21,7 +22,7 @@ class LocalSyslogHandler(SysLogHandler):
         else:
             super().emit(record)
 
-def getLogger(name, log_level=None, log_format='standard', use_syslog: bool = True):
+def getLogger(name: str, log_level: Optional[Union[str, int]] = None, log_format: Literal['standard', 'json'] = 'standard', use_syslog: bool = True):
     '''
     Get a logger by the name provided. Set the log_level if you provide the second argument.
     If not, ask the environment for $LOG_LEVEL. If not, default to DEBUG.

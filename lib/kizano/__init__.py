@@ -3,8 +3,9 @@ import os
 import kizano.logger as logger
 import kizano.utils as utils
 import kizano.tickets as tickets
-log = logger.getLogger(__name__)
+getLogger = logger.getLogger
 
+log = logger.getLogger(__name__)
 class Config(object):
     '''
     Configuration object that tracks config in /etc/${APP_NAME}/config.yml and
@@ -59,4 +60,4 @@ class Config(object):
 
 def getConfig(): return Config.getConfig()
 
-__all__ = ['logger', 'Config', 'getConfig', 'tickets', 'utils']
+__all__ = ['getLogger', 'getConfig', 'logger', 'Config', 'tickets', 'utils']
