@@ -6,16 +6,19 @@ build-backend = "setuptools.build_meta"
 name = "kizano"
 version = "1.0.7"
 requires-python = ">=3.9"
-dependencies = [ "PyYAML>=6.0.1" ]
+dependencies = [
+ "jira>=3.8.0",
+ "PyYAML>=6.0.1",
+]
 authors = [
   {name = "Markizano Draconus", email = "markizano@markizano.net"},
 ]
 maintainers = [
   {name = "Markizano Draconus", email = "markizano@markizano.net"},
 ]
-description = "Library of functions that have served me no matter where I code."
+description = "Kizano code for quick access to functions."
 readme = "README.md"
-license = {file = "LICENSE.txt"}
+license = "MIT"
 
 classifiers = [
   "Development Status :: 4 - Beta",
