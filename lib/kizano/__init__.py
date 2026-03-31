@@ -2,6 +2,7 @@
 import os
 import kizano.logger as logger
 import kizano.utils as utils
+import kizano.tickets as tickets
 log = logger.getLogger(__name__)
 
 class Config(object):
@@ -28,8 +29,8 @@ class Config(object):
             log.debug('Cache-HIT: Returning config from cache')
             return Config.__CONFIGCACHE
         cfgfiles = [
-          os.path.join(os.path.sep, 'etc', Config.APP_NAME, 'config.yml'),
-          os.path.join(os.environ['HOME'], '.config', Config.APP_NAME, 'config.yml')
+            os.path.join(os.path.sep, 'etc', Config.APP_NAME, 'config.yml'),
+            os.path.join(os.environ['HOME'], '.config', Config.APP_NAME, 'config.yml')
         ]
         for cfgfile in cfgfiles:
             try:
@@ -42,6 +43,20 @@ class Config(object):
         log.debug('Cache-Miss: Config loaded!')
         return Config.__CONFIGCACHE
 
-getConfig = Config.getConfig
+    @staticmethod
+    def clearCache():
+        '''
+        Static method to clear the cache and force a config reload in future.
+        '''
+        Config.__CONFIGCACHE = {}
 
-__all__ = ['logger', 'Config', 'getConfig', 'utils']
+    @staticmethod
+    def setAppName(name: str):
+        '''
+        Changes the app name to be used throughout the configuration object.
+        '''
+        Config.APP_NAME = name
+
+def getConfig(): return Config.getConfig()
+
+__all__ = ['logger', 'Config', 'getConfig', 'tickets', 'utils']
