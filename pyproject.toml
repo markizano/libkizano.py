@@ -43,7 +43,7 @@ write_to = "lib/kizano/_version.py"
 write_to_template = "__version__ = \"{version}\"\n"
 
 [tool.setuptools.package-dir]
-mkzforge = "lib/kizano"
+kizano = "lib/kizano"
 
 [tool.setuptools.packages.find]
 where = ["lib"]
