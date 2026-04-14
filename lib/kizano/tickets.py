@@ -33,6 +33,7 @@ COMMON_FIELDS = {
     'reporter': 'reporter',
     'priority': 'priority',
     'issue_type': 'issuetype',
+    'issuelinks': 'issuelinks',
     'created': 'created',
     'updated': 'updated',
     'resolution': 'resolution',
@@ -53,13 +54,22 @@ COMMON_FIELDS = {
     'story_points': 'customfield_10016',  # Common Story Points field
 }
 
+
 class TicketNotFoundError(Exception):
     '''Exception raised when a JIRA ticket is not found or inaccessible.'''
+
     pass
 
 
 class FieldNotFoundError(Exception):
     '''Exception raised when a field is not found in a JIRA ticket.'''
+
+    pass
+
+
+class FieldNotFoundError(Exception):
+    '''Exception raised when a field is not found in a JIRA ticket.'''
+
     pass
 
 def getAtlassianSecrets():
@@ -120,6 +130,7 @@ def getFieldMappings() -> Dict[str, str]:
 
     return FIELD_MAPPING_CACHE
 
+
 def getIssueTypes() -> Dict[str, IssueType]:
     '''
     Get the list of issue types available.
@@ -142,6 +153,7 @@ def getIssueTypes() -> Dict[str, IssueType]:
         ISSUETYPE_MAPPING_CACHE[name] = issuetype
 
     return ISSUETYPE_MAPPING_CACHE
+
 
 class Ticket:
     '''
@@ -169,7 +181,9 @@ class Ticket:
     '''
 
     @classmethod
-    def create(cls, project: str, summary: str, description: str, issuetype: str, **kwargs) -> Self:
+    def create(
+        cls, project: str, summary: str, description: str, issuetype: str, **kwargs
+    ) -> Self:
         '''
         Factory Method:
         Creates a new issue based on the input fields and returns a new Ticket() object as a result.
@@ -183,7 +197,9 @@ class Ticket:
         assert project != '', 'Project cannot be empty!'
         assert summary != '', 'Summary must have some text!'
         assert issuetype != '', 'Issue Type is required!'
-        assert issuetype in issuetypes.keys(), f'IssueType must be one of: {", ".join(issuetypes.keys())}'
+        assert issuetype in issuetypes.keys(), (
+            f'IssueType must be one of: {', '.join(issuetypes.keys())}'
+        )
         issue_details = {
             'project': project,
             'summary': summary,
@@ -212,13 +228,42 @@ class Ticket:
         '''Load ticket data from JIRA if not already loaded.'''
         if not self._loaded:
             try:
-                # Fetch ticket with all fields using the jira package
-                issue = self._jira_client.issue(self.ticket_id, expand='changelog')
+                # Fetch ticket with all fields including comments and changelog using the jira package
+                issue = self._jira_client.issue(
+                    self.ticket_id, expand='changelog,renderedFields'
+                )
+                # Fetch comments separately for better structure
+                comments = self._jira_client.comments(self.ticket_id)
+
+                # Process attachments from fields
+                attachments = []
+                raw_attachments = issue.raw.get('fields', {}).get('attachment', [])
+                if raw_attachments:
+                    for attachment in raw_attachments:
+                        attachments.append(
+                            {
+                                'id': attachment.get('id'),
+                                'filename': attachment.get('filename'),
+                                'author': attachment.get('author', {}).get(
+                                    'displayName'
+                                ),
+                                'created': attachment.get('created'),
+                                'size': attachment.get('size'),
+                                'mimeType': attachment.get('mimeType'),
+                                'content': attachment.get('content'),  # CDN URL
+                                'thumbnail': attachment.get(
+                                    'thumbnail'
+                                ),  # Thumbnail URL if available
+                            }
+                        )
+
                 # Convert the issue object to a dictionary-like structure
                 self._ticket_data = {
                     'fields': issue.raw['fields'],
                     'key': issue.key,
-                    'id': issue.id
+                    'id': issue.id,
+                    'comments': [comment.raw for comment in comments],
+                    'attachments': attachments,
                 }
                 self._loaded = True
             except Exception as e:
@@ -277,7 +322,7 @@ class Ticket:
         self._load_ticket_data()
 
         if not self._ticket_data:
-            raise TicketNotFoundError(f"Ticket {self.ticket_id} not found")
+            raise TicketNotFoundError(f'Ticket {self.ticket_id} not found')
 
         # Handle nested field access (e.g., 'assignee.displayName')
         if '.' in field_name:
@@ -289,6 +334,14 @@ class Ticket:
 
         if field_name == 'key':
             return self._ticket_data['key']
+
+        # Handle comments as a special case (stored at top level, not in fields)
+        if field_name == 'comments':
+            return self._ticket_data.get('comments', [])
+
+        # Handle attachments as a special case (processed and stored at top level)
+        if field_name == 'attachments':
+            return self._ticket_data.get('attachments', [])
 
         # Get field mapping from JIRA
         field_mapping = getFieldMappings()
@@ -371,8 +424,13 @@ class Ticket:
         fields: Dict[str, Dict[str, Any]] = {
             'id': self._ticket_data.get('id'),
             'key': self._ticket_data.get('key'),
+            'comments': self._ticket_data.get('comments', []),
+            'attachments': self._ticket_data.get('attachments', []),
         }
         for field_name in COMMON_FIELDS.keys():
+            if field_name in ('comments', 'attachments'):
+                # Already handled above from top-level data
+                continue
             fields[field_name] = ticket_fields.get(field_name)
 
         return fields
@@ -384,23 +442,29 @@ class Ticket:
         return json.dumps(self.as_dict(), indent=indent, sort_keys=sort_keys, default=str)
 
     def refresh(self) -> None:
-        '''Refresh ticket data from JIRA.'''
+        '''
+        Refresh ticket data from JIRA.
+        '''
         self._loaded = False
         self._ticket_data = {}
         self._load_ticket_data()
 
     def __str__(self) -> str:
-        '''String representation of the ticket.'''
+        '''
+        String representation of the ticket.
+        '''
         try:
             self._load_ticket_data()
             if self._ticket_data:
                 summary = self._ticket_data.get('fields', {}).get('summary', 'No summary')
                 status = self._ticket_data.get('fields', {}).get('status', {}).get('name', 'Unknown')
-                return f"{self.ticket_id}: {summary} [{status}]"
-            return f"{self.ticket_id}: Not loaded"
+                return f'{self.ticket_id}: {summary} [{status}]'
+            return f'{self.ticket_id}: Not loaded'
         except Exception:
-            return f"{self.ticket_id}: Error loading"
+            return f'{self.ticket_id}: Error loading'
 
     def __repr__(self) -> str:
-        '''Representation of the ticket object.'''
+        '''
+        Representation of the ticket object.
+        '''
         return f"Ticket('{self.ticket_id}')"
